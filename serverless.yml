@@ -1,0 +1,24 @@
+org: matthew5741984
+app: waterlevelscraper
+service: serverless-scraper
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: eu-west-2
+  timeout: 30
+  cfnRole: arn:aws:iam::519631079778:role/cfnRole
+
+functions:
+  app:
+    handler: handler.scrape
+    layers:
+      - ${cf:selenium-layer-dev.SeleniumLayerExport}
+      - ${cf:selenium-layer-dev.ChromedriverLayerExport}
