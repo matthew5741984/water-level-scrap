@@ -3,29 +3,17 @@ import decimal
 import pytz
 import sys
 import uuid
-from settings import get_aws_access_key
-from settings import get_aws_secret_access_key
-from settings import get_region
+from awsToken import aws_session_token
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 from time import sleep
 
-
-def aws_session_token():
-    session = boto3.Session(
-        aws_access_key_id=get_aws_access_key(),
-        aws_secret_access_key=get_aws_secret_access_key(),
-        region_name=get_region(),
-    )
-    return session
-
-
 session = aws_session_token()
 dynamodb = session.resource('dynamodb')
 three_gorges_table = 'three_gorges_reservoir_table'
-other_station_table = 'other_station_reservoir_table'
+other_stations_table = 'other_stations_table'
 tz = pytz.timezone('Europe/London')
 dt = datetime.now(tz)
 dt_string = dt.strftime("%d/%m/%Y %H:%M:%S")
@@ -91,10 +79,9 @@ def web_scraping():
                 water_level_all = datetime_all.find_next_sibling("td")
                 water_flow_all = water_level_all.find_next_sibling("td")
 
-                table = dynamodb.Table(other_station_table)
+                table = dynamodb.Table(other_stations_table)
                 table.put_item(
                     Item={
-                        'UUID': str(uuid.uuid1()),
                         'StationName': station_name_all.text,
                         'DateTime': str(dt_string),
                         'WaterLevel': decimal.Decimal(water_level_all.text),

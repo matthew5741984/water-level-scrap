@@ -1,5 +1,5 @@
-python-dotenv
 boto3
 botocore
 pytz
 bs4
+python-dotenv
